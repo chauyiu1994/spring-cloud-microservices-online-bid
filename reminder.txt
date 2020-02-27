@@ -1,0 +1,4 @@
+# Generate keystore
+keytool -genkeypair -alias apiEncryptionKey -keyalg RSA -dname "CN=Michael Chau,OU=API Development,O=appsdeveloperblog.com,L=Ottawa,S=HK,C=HK" -keypass 1q2w3e4r -keystore apiEncryptionKey.jks -storepass 1q2w3e4r
+# Migrate to PKCS12
+keytool -importkeystore -srckeystore apiEncryptionKey.jks -destkeystore apiEncryptionKey.jks -deststoretype pkcs12

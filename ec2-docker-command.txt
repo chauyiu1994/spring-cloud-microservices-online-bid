@@ -1,0 +1,75 @@
+# EC2 instance install docker and update
+sudo yum update
+sudo yum install docker 
+sudo service docker start
+# run docker on ec2-user instead of root
+sudo usermod -a -G docker ec2-user
+
+# Config Server + Rabbitmq
+#Rabbitmq
+docker run -d --name rabbit-name-management 
+-p 15672:15672 -p 5672:5672 -p 15671:15671 -p 5671:5671 -p 4369:4369 
+rabbitmq:3-management
+
+# Config Server (docker locallost = 172.17.0.2)
+docker run -d 
+-p 8012:8012 
+-e "spring.rabbitmq.host=172.17.0.2" 
+-e "spring.rabbitmq.username=guest" 
+-e "spring.rabbitmq.password=guest" 
+chauyiu1994/config-server
+
+# Eureka
+docker run -d 
+-p 8010:8010 
+-e "spring.cloud.config.uri=http://18.188.177.158:8012" 
+-e "spring.rabbitmq.host=172.31.26.116" 
+-e "spring.rabbitmq.username=guest" 
+-e "spring.rabbitmq.password=guest" 
+chauyiu1994/eureka-server
+
+# Zuul Api Gateway
+docker run -d 
+-p 8011:8011
+-e "spring.cloud.config.uri=http://172.31.26.116:8012" 
+-e "spring.rabbitmq.host=172.31.26.116" 
+-e "spring.rabbitmq.username=guest" 
+-e "spring.rabbitmq.password=guest"  
+chauyiu1994/zuul-api-gateway
+
+# Albums Service
+docker run -d 
+-p 8989:8989
+-e "spring.cloud.config.uri=http://172.31.26.116:8012" 
+-e "spring.rabbitmq.host=172.31.26.116" 
+-e "spring.rabbitmq.username=guest" 
+-e "spring.rabbitmq.password=guest" 
+-e "server.port=8989"  
+-e "eureka.instance.ip-address=18.191.93.66" 
+-e "eureka.instance.prefer-ip-addess=true" 
+-e "logging.file.name=/api-logs/albums-ws.log" 
+-v /home/ec2-user/api-logs:/api-logs 
+chauyiu1994/albums-microservice
+
+# MYSQL
+docker run –d 
+-p 3306:3306 
+--name mysql-docker-container
+-e MYSQL_ROOT_PASSWORD=test
+-e MYSQL_DATABASE=photo_app
+-e MYSQL_USER=test
+-e MYSQL_PASSWORD=test
+-v /var/lib/mysql:/var/lib/mysql
+mysql:latest
+
+# Users Service (use --network host instead of -e "server.port=8181" -p 8181:8181 for random port number)
+docker run -d
+-p 8181:8181
+-e "spring.cloud.config.uri=http://172.31.26.116:8012" 
+-e "spring.rabbitmq.host=172.31.26.116" 
+-e "spring.rabbitmq.username=guest" 
+-e "spring.rabbitmq.password=guest" 
+-e "server.port=8181"
+-e "logging.file.name=/api-logs/users-ws.log" 
+-v /home/ec2-user/api-logs:/api-logs 
+chauyiu1994/users-microservice

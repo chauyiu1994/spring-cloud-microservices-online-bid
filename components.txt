@@ -1,0 +1,25 @@
+component:
+
+users service
+albums service
+api gateway (loading balancer)
+discovery service
+config server => spring cloud bus /
+account management service
+
+keystore
+actuator
+feign client
+hystrix circuit breaker
+
+
+rabbitmq
+mysql
+sleuth + zipkin
+logstash (ELK)
+elasticsearch
+kibana
+
+
+kafka
+hadoop

@@ -1,0 +1,9 @@
+-- decr num_of_like in product table after delete of bid
+DELIMITER $$
+CREATE TRIGGER BID_AFTER_DELETE_TRIG
+AFTER DELETE ON `BID` FOR EACH ROW
+begin
+    UPDATE PRODUCT SET NUM_OF_BID = NUM_OF_BID - 1 WHERE ID = OLD.PRODUCT_ID;
+END;
+$$
+DELIMITER ;

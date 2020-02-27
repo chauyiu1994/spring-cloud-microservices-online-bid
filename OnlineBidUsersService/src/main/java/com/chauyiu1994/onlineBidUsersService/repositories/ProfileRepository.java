@@ -1,0 +1,15 @@
+package com.chauyiu1994.onlineBidUsersService.repositories;
+
+import com.chauyiu1994.onlineBidUsersService.domain.Profile;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
+
+@Repository
+public interface ProfileRepository {
+
+    Mono<Profile> addFriend(String id, String friendId);
+    Mono<Profile> save(Profile profile);
+    Mono<Profile> findByUserId(String userId);
+    Mono<Profile> findById(String id);
+    Mono<Void> deleteById(String id);
+}

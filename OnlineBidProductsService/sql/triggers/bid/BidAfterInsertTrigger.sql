@@ -1,0 +1,9 @@
+-- incr num_of_like in product table after insert of bid
+DELIMITER $$
+CREATE TRIGGER BID_AFTER_INSERT_TRIG
+AFTER INSERT ON `BID` FOR EACH ROW
+begin
+    UPDATE PRODUCT SET NUM_OF_BID = NUM_OF_BID + 1 WHERE ID = NEW.PRODUCT_ID;
+END;
+$$
+DELIMITER ;
