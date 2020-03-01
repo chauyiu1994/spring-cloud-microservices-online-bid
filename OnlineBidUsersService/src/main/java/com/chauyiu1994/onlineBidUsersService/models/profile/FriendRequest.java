@@ -8,7 +8,7 @@ import org.springframework.lang.NonNull;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddFriendRequest {
+public class FriendRequest {
 
     @NonNull
     private String friendId;

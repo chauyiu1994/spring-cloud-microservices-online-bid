@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @AllArgsConstructor
 public class ResourceController {
-
+    
     private ProductClient productClient;
 
     @GetMapping("/resource/user")

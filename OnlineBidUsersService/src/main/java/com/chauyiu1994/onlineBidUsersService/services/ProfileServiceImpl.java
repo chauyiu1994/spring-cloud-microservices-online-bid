@@ -32,17 +32,23 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional
     public Mono<Profile> addFriend(String id, String friendId) {
 
-        return profileRepository.findById(id).flatMap(mainProfile -> {
-            if (mainProfile != null) {
-                profileRepository.findByUserId(friendId).flatMap(fdProfile -> {
-                    if (fdProfile != null) {
-                        profileRepository.addFriend(id, friendId);
-                    }
-                    return Mono.empty();
-                });
-            }
-            return Mono.empty();
-        });
+        return profileRepository.findByUserIdAndFriendNotAddedYet(id, friendId)
+                .flatMap(mainProfile -> {
+                    System.out.println(mainProfile);
+                    return profileRepository.findByUserId(friendId);
+                })
+                .flatMap(fdProfile -> profileRepository.addFriend(id, friendId));
+    }
+
+    @Override
+    public Mono<Profile> removeFriend(String id, String friendId) {
+
+        return profileRepository.findByUserIdAndFriendContains(id, friendId)
+                .flatMap(mainProfile -> {
+                    System.out.println(mainProfile);
+                    return profileRepository.findByUserId(friendId);
+                })
+                .flatMap(fdProfile -> profileRepository.removeFriend(id, friendId));
     }
 
     @Override

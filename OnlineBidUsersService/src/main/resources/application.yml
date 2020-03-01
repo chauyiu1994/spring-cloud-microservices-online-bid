@@ -1,0 +1,28 @@
+spring:
+  cloud:
+    stream:
+      bindings:
+        addFriend:
+          destination: queue.log.messages.addFriend
+          binder: local_rabbit
+          group: group1
+        unFriend:
+          destination: queue.log.messages.unFriend
+          binder: local_rabbit
+          group: group1
+      binders:
+        local_rabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+server:
+  port: 0
+management:
+  health:
+    binders:
+      enabled: true

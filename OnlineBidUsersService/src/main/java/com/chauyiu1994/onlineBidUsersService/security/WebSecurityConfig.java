@@ -36,7 +36,6 @@ public class WebSecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
 
-        System.out.println("fdvfvfddb");
         http
                 .exceptionHandling()
                 .authenticationEntryPoint((swe, e) -> {

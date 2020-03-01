@@ -10,5 +10,4 @@ public interface ProductClient {
 
     @GetMapping("/products")
     Mono<ProductListResponseModel> getProducts();
-
 }

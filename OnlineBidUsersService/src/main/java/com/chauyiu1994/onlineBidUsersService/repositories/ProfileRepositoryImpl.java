@@ -6,11 +6,13 @@ import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
-import static com.mongodb.client.model.Filters.eq;
+import java.util.Arrays;
+import java.util.Collections;
+
+import static com.mongodb.client.model.Filters.*;
 
 @Repository
 public class ProfileRepositoryImpl implements ProfileRepository {
@@ -28,9 +30,16 @@ public class ProfileRepositoryImpl implements ProfileRepository {
     public Mono<Profile> addFriend(String id, String friendId) {
 
         return addToSet(friendId, id)
-                .flatMap(fdResult -> addToSet(id, friendId)
-                        .flatMap(mainResult -> profileBaseRepository.findById(id))
-                );
+                .flatMap(fdResult -> addToSet(id, friendId))
+                .flatMap(mainResult -> profileBaseRepository.findByUserId(id));
+    }
+
+    @Override
+    public Mono<Profile> removeFriend(String id, String friendId) {
+
+        return removeFromSet(friendId, id)
+                .flatMap(fdResult -> removeFromSet(id, friendId))
+                .flatMap(mainResult -> profileBaseRepository.findByUserId(id));
     }
 
     @Override
@@ -45,11 +54,41 @@ public class ProfileRepositoryImpl implements ProfileRepository {
         return profileBaseRepository.findByUserId(userId);
     }
 
+    @Override
+    public Mono<Document> findByUserIdAndFriendNotAddedYet(String userId, String friendId) {
+
+        return Mono.from(profilesCollection.find(
+                and(
+                        eq("userId", userId),
+                        nin("friends", Collections.singletonList(friendId))
+                )
+        ));
+    }
+
+    @Override
+    public Mono<Document> findByUserIdAndFriendContains(String userId, String friendId) {
+
+        return Mono.from(profilesCollection.find(
+                and(
+                        eq("userId", userId),
+                        in("friends", Collections.singleton(friendId))
+                )
+        ));
+    }
+
     private Mono<UpdateResult> addToSet(String targetId, String friendId) {
 
         return Mono.from(profilesCollection.updateOne(
-                eq("_id", new ObjectId(targetId)),
+                eq("userId", targetId),
                 Updates.addToSet("friends", friendId)
+        ));
+    }
+
+    private Mono<UpdateResult> removeFromSet(String targetId, String friendId) {
+
+        return Mono.from(profilesCollection.updateOne(
+                eq("userId", targetId),
+                Updates.pull("friends", friendId)
         ));
     }
 

@@ -32,13 +32,21 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public Mono<SecurityContext> load(ServerWebExchange swe) {
+    public String getToken(ServerWebExchange swe) {
 
         ServerHttpRequest request = swe.getRequest();
         String authHeaderStr = request.getHeaders().getFirst(authorizationHeader);
         if (authHeaderStr != null && authHeaderStr.startsWith(authTokenPrefix)) {
-            String authToken = authHeaderStr.replace(authTokenPrefix, "");
+            return authHeaderStr.replace(authTokenPrefix, "");
+        }
+        return null;
+    }
+
+    @Override
+    public Mono<SecurityContext> load(ServerWebExchange swe) {
+
+        String authToken = getToken(swe);
+        if (authToken != null) {
             Authentication auth = new UsernamePasswordAuthenticationToken(authToken, authToken);
             return this.authenticationManager.authenticate(auth)
                     .map(authentication -> new SecurityContextImpl(authentication));
